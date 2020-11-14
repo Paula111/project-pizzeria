@@ -58,12 +58,16 @@
       thisProduct.id = id;
       thisProduct.data = data;
       thisProduct.renderInMenu();
+      thisProduct.getElements();
       thisProduct.initAccordion();
+      thisProduct.initOrderForm();
+      thisProduct.processOrder();
+
       console.log('new Product:', thisProduct);
     }
+
     renderInMenu() {
       const thisProduct = this;
-
       /* generate HTML based on template */
       const generatedHTML = templates.menuProduct(thisProduct.data);
       /* create element using utils.createElementFromHTML */
@@ -74,13 +78,23 @@
       menuContainer.appendChild(thisProduct.element);
     }
 
+    getElements() {
+      const thisProduct = this;
+
+      thisProduct.accordionTrigger = thisProduct.element.querySelector(select.menuProduct.clickable);
+      thisProduct.form = thisProduct.element.querySelector(select.menuProduct.form);
+      thisProduct.formInputs = thisProduct.form.querySelectorAll(select.all.formInputs);
+      thisProduct.cartButton = thisProduct.element.querySelector(select.menuProduct.cartButton);
+      thisProduct.priceElem = thisProduct.element.querySelector(select.menuProduct.priceElem);
+    }
+
     initAccordion() {
       const thisProduct = this;
 
       /* find the clickable trigger (the element that should react to clicking) */
-      const trigger = thisProduct.element.querySelector(select.menuProduct.clickable);
+      thisProduct.accordionTrigger = thisProduct.element.querySelector(select.menuProduct.clickable);
       /* START: click event listener to trigger */
-      trigger.addEventListener('click', function (event) {
+      thisProduct.accordionTrigger.addEventListener('click', function (event) {
         /* prevent default action for event */
         event.preventDefault();
         /* toggle active class on element of thisProduct */
@@ -89,47 +103,58 @@
         const allActiveProducts = document.querySelectorAll(select.all.menuProductsActive);
 
         /* START LOOP: for each active product */
-        for (let activeProduct of allActiveProducts) {
+        for (let activeProduct of allActiveProducts){
           /* START: if the active product isn't the element of thisProduct */
           if (activeProduct != thisProduct.element) {
             /* remove class active for the active product */
             activeProduct.classList.remove('active');
             /* END: if the active product isn't the element of thisProduct */
-          }
-          /* END LOOP: for each active product */
-        }
-        /* END: click event listener to trigger */
-      }
-      );
+          }}
+        /* END LOOP: for each active product */
+      });
+      /* END: click event listener to trigger */
     }
-  }
 
-    const app = {
-      initMenu: function () {
-        const thisApp = this;
-        console.log('thisApp.data:', thisApp.data);
-        for (let productData in thisApp.data.products) {
-          new Product(productData, thisApp.data.products[productData]);
-        }
-      },
 
-      initData: function () {
-        const thisApp = this;
+    initOrderForm() {
+      const thisProduct = this;
+      console.log('initOrderForm', thisProduct);
+    }
 
-        thisApp.data = dataSource;
-      },
 
-      init: function () {
-        const thisApp = this;
-        console.log('*** App starting ***');
-        console.log('thisApp:', thisApp);
-        console.log('classNames:', classNames);
-        console.log('settings:', settings);
-        console.log('templates:', templates);
-        thisApp.initData();
-        thisApp.initMenu();
-      },
-    };
+    processOrder() {
+      const thisProduct = this;
+      console.log('processOrder', thisProduct);
+    }
 
-    app.init();
-  }
+
+
+  const app = {
+    initMenu: function () {
+      const thisApp = this;
+      console.log('thisApp.data:', thisApp.data);
+      for (let productData in thisApp.data.products) {
+        new Product(productData, thisApp.data.products[productData]);
+      }
+    },
+
+    initData: function () {
+      const thisApp = this;
+
+      thisApp.data = dataSource;
+    },
+
+    init: function () {
+      const thisApp = this;
+      console.log('*** App starting ***');
+      console.log('thisApp:', thisApp);
+      console.log('classNames:', classNames);
+      console.log('settings:', settings);
+      console.log('templates:', templates);
+      thisApp.initData();
+      thisApp.initMenu();
+    },
+  };
+
+  app.init();
+}
