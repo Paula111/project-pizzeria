@@ -204,7 +204,7 @@
       /* set the contents of thisProduct.priceElem to be the value of variable price */
       const totalPrice = thisProduct.element.getElementsByClassName('product__total-price price');
       totalPrice.innerHTML = '';
-      
+
       /* multiply price by amount */
       productPrice *= thisProduct.amountWidget.value;
       thisProduct.priceElem.innerHTML = productPrice;
@@ -223,7 +223,9 @@
     constructor(element) {
       const thisWidget = this;
       thisWidget.getElements(element);
-      thisWidget.setValue(thisWidget.input.value)
+      thisWidget.value = settings.amountWidget.defaultValue;
+      thisWidget.setValue(thisWidget.input.value);
+      thisWidget.initActions();
 
       console.log('AmountWidget:', thisWidget);
       console.log('constructor arguments:', element);
@@ -241,13 +243,15 @@
     setValue(value) {
       const thisWidget = this;
       const newValue = parseInt(value);
-      /* TODO: Add validation*/
+      /* TO DO: Add validation*/
 
-      thisWidget.value = newValue;
-      thisWidget.announce();
+      if (newValue != thisWidget.value && newValue >= settings.amountWidget.defaultMin && newValue <= settings.amountWidget.defaultMax) {
+        thisWidget.value = newValue;
+        thisWidget.announce();
+      }
       thisWidget.input.value = thisWidget.value;
-      thisWidget.initActions();
     }
+
 
     initActions() {
       const thisWidget = this;
