@@ -189,12 +189,12 @@
           const images = thisProduct.imageWrapper.querySelectorAll('.' + paramId + '-' + optionId);
           if (optionSelected) {
             for (let image of images) {
-              image.classList.add('active');
+              image.classList.add(classNames.menuProduct.imageVisible);
             }
           }
           else {
             for (let image of images) {
-              image.classList.remove('active');
+              image.classList.remove(classNames.menuProduct.imageVisible);
             }
           }
           /* END LOOP: for each optionId in param.options */
@@ -214,7 +214,7 @@
       const thisProduct = this;
       thisProduct.amountWidget = new AmountWidget(thisProduct.amountWidgetElem);
       thisProduct.amountWidgetElem.addEventListener('updated', function () {
-        thisProduct.processOrder()
+        thisProduct.processOrder();
       });
     }
   }
