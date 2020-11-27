@@ -1,8 +1,11 @@
 import { Product } from './components/Product.js';
+import { Booking } from './components/Booking.js';
 import { Cart } from './components/Cart.js';
-import { select, settings } from './settings.js';
+import { select, settings, classNames } from './settings.js';
+
 
 const app = {
+
   initMenu: function () {
     const thisApp = this;
     //console.log('thisApp.data:', thisApp.data);
@@ -23,7 +26,7 @@ const app = {
         return rawResponse.json();
       })
       .then(function (parsedResponse) {
-        console.log('parsedResponse', parsedResponse);
+        // console.log('parsedResponse', parsedResponse);
 
         /* save parsedResponse as thisApp.data.products */
         thisApp.data.products = parsedResponse;
@@ -31,7 +34,7 @@ const app = {
         thisApp.initMenu();
       });
 
-    console.log('thisApp.data', JSON.stringify(thisApp.data));
+    // console.log('thisApp.data', JSON.stringify(thisApp.data));
   },
 
   initCart: function () {
@@ -47,6 +50,62 @@ const app = {
     });
   },
 
+  initPages: function () {
+    const thisApp = this;
+
+    thisApp.pages = Array.from(document.querySelector(select.containerOf.pages).children);
+    thisApp.navLinks = Array.from(document.querySelectorAll(select.nav.links));
+    console.log(thisApp.navLinks);
+    let pagesMatchingHash = [];
+    if (window.location.hash.length > 2) {
+      const idFromHash = window.location.hash.replace('#/', '');
+
+      pagesMatchingHash = thisApp.pages.filter(function (page) {
+        return page.id == idFromHash;
+      });
+    }
+
+    thisApp.activatePage(pagesMatchingHash.length ? pagesMatchingHash[0].id : thisApp.pages[0].id);
+
+    for (let link of thisApp.navLinks) {
+      console.log(thisApp.navLinks);
+      link.addEventListener('click', function (event) {
+        const clickedElement = this;
+        event.preventDefault();
+
+        /* TO DO: get page id from href */
+        const id = clickedElement.getAttribute('href').replace('#', '');
+
+        /* TO DO: activate page */
+        thisApp.activatePage(id);
+      });
+    }
+  },
+
+  activatePage: function (pageId) {
+    const thisApp = this;
+    window.location.hash = '#/' + pageId;
+
+    for (let page of thisApp.pages) {
+      page.classList.toggle(classNames.pages.active, page.id == pageId);
+      //console.log(thisApp.pages);
+    }
+
+    for (let link of thisApp.navLinks) {
+      link.classList.toggle(classNames.nav.active, link.getAttribute('href') == '#' + pageId);
+      //console.log(thisApp.navLinks);
+    }
+  },
+
+
+  initBooking: function () {
+    const thisApp = this;
+    const bookingWrapper = document.querySelector(select.containerOf.booking);
+    console.log('bookingWrapper:', bookingWrapper);
+
+    thisApp.booking = new Booking(bookingWrapper);
+  },
+
 
   init: function () {
     const thisApp = this;
@@ -55,8 +114,11 @@ const app = {
     //console.log('classNames:', classNames);
     //console.log('settings:', settings);
     //console.log('templates:', templates);
+    thisApp.initPages();
     thisApp.initData();
     thisApp.initCart();
+    thisApp.initBooking();
+
   },
 };
 
