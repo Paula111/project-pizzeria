@@ -11,6 +11,7 @@ export class Booking {
     thisBooking.render(bookingWrapper);
     thisBooking.initWidgets();
     thisBooking.getData();
+    thisBooking.selectTable();
     //thisBooking.dom.wrapper = bookingWrapper;
   }
 
@@ -25,6 +26,7 @@ export class Booking {
     thisBooking.dom.datePicker = thisBooking.dom.wrapper.querySelector(select.widgets.datePicker.wrapper);
     thisBooking.dom.hourPicker = thisBooking.dom.wrapper.querySelector(select.widgets.hourPicker.wrapper);
     thisBooking.dom.tables = thisBooking.dom.wrapper.querySelectorAll(select.booking.tables);
+    thisBooking.dom.starters = thisBooking.dom.wrapper.querySelectorAll(select.booking.starters);
   }
 
   initWidgets() {
@@ -33,10 +35,16 @@ export class Booking {
     thisBooking.hoursAmount = new AmountWidget(thisBooking.dom.hoursAmount);
     thisBooking.datePicker = new DatePicker(thisBooking.dom.datePicker);
     thisBooking.hourPicker = new HourPicker(thisBooking.dom.hourPicker);
+
     thisBooking.dom.wrapper.addEventListener('updated', function () {
       thisBooking.updateDOM();
     });
+    thisBooking.dom.wrapper.addEventListener('submit', function (event) {
+      event.preventDefault();
+      thisBooking.sendBooking();
+    });
   }
+
 
   getData() {
     const thisBooking = this;
@@ -52,7 +60,7 @@ export class Booking {
       eventsCurrent: settings.db.notRepeatParam + '&' + utils.queryParams(startEndDates),
       eventsRepeat: settings.db.repeatParam + '&' + utils.queryParams(endDate),
     };
-    console.log('getData params', params);
+    // console.log('getData params', params);
 
     const urls = {
       booking: settings.db.url + '/' + settings.db.booking + '?' + params.booking,
@@ -60,7 +68,7 @@ export class Booking {
       eventsRepeat: settings.db.url + '/' + settings.db.event + '?' + params.eventsRepeat,
     };
 
-    console.log('getData urls', urls);
+    // console.log('getData urls', urls);
 
     Promise.all([
       fetch(urls.booking),
@@ -103,7 +111,7 @@ export class Booking {
         }
       }
     }
-    console.log('thisBooking.booked:', thisBooking.booked);
+    // console.log('thisBooking.booked:', thisBooking.booked);
     thisBooking.updateDOM();
   }
 
@@ -126,7 +134,7 @@ export class Booking {
 
   updateDOM() {
     const thisBooking = this;
-    console.log('updateDOM');
+    // console.log('updateDOM');
 
     thisBooking.date = thisBooking.datePicker.value;
     thisBooking.hour = utils.hourToNumber(thisBooking.hourPicker.value);
@@ -145,5 +153,73 @@ export class Booking {
         console.log('Table is not available.');
       }
     }
+  }
+
+  selectTable() {
+    const thisBooking = this;
+    console.log('selectTable');
+
+
+    for (let table of thisBooking.dom.tables) {
+      table.addEventListener('click', function (event) {
+        event.preventDefault();
+
+        // let tableId = table.getAttribute(settings.booking.tableIdAttribute);
+        const tableClicked = table.getAttribute(settings.booking.tableIdAttribute);
+
+        if (typeof thisBooking.booked[thisBooking.date][thisBooking.hour] == 'undefined') {
+          if (table.classList.contains(classNames.booking.tableBooked)) {
+            table.classList.remove(classNames.booking.tableBooked);
+
+            console.log('Remove booking for this table');
+          }
+
+          else {
+            table.classList.add(classNames.booking.tableBooked);
+
+            console.log('Table is booked');
+          }
+        }
+        thisBooking.tableBooked = tableClicked;
+      });
+    }
+  }
+
+  sendBooking() {
+    const thisBooking = this;
+    console.log('sendBooking');
+
+    const url = settings.db.url + '/' + settings.db.booking;
+
+    const payload = {
+      date: thisBooking.datePicker.value,
+      hour: thisBooking.hourPicker.value,
+      table: thisBooking.tableBooked,
+      duration: thisBooking.hoursAmount.value,
+      ppl: thisBooking.peopleAmount.value,
+      starters: [],
+    };
+
+    for (let starter of thisBooking.dom.starters) {
+      if (starter.selected == true) {
+        payload.starters.push[starter.value];
+      }
+    }
+
+    const options = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    };
+
+    fetch(url, options)
+      .then(function (response) {
+        return response.json();
+      })
+      .then(function (parsedResponse) {
+        console.log('parsedResponse', parsedResponse);
+      });
   }
 }
