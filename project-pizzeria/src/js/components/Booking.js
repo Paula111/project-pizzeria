@@ -153,6 +153,7 @@ export class Booking {
         console.log('Table is not available.');
       }
     }
+    thisBooking.colorSlider();
   }
 
   selectTable() {
@@ -221,5 +222,32 @@ export class Booking {
       .then(function (parsedResponse) {
         console.log('parsedResponse', parsedResponse);
       });
+  }
+
+  colorSlider() {
+    const thisBooking = this;
+    const rangeSlider = document.querySelector('.rangeSlider__horizontal');
+    let colors = 'linear-gradient(to right';
+    let progress = 0;
+    let next = 4.2;
+
+    for (let timeOfBooking = 12; timeOfBooking <= 24; timeOfBooking += 0.5) {
+      if (typeof thisBooking.booked[thisBooking.date] === 'undefined' || typeof thisBooking.booked[thisBooking.date][timeOfBooking] === 'undefined') {
+        let nextValue = progress + next;
+        colors += ',#006400' + ' ' + progress + '%' + ' ' + nextValue + '%';
+        progress += next;
+      } else if (thisBooking.booked[thisBooking.date][timeOfBooking].length == 1) {
+        let nextValue = progress + next;
+        colors += ',#FFFF00' + ' ' + progress + '%' + ' ' + nextValue + '%';
+        progress += next;
+      } else if (thisBooking.booked[thisBooking.date][timeOfBooking].length == 2) {
+        let nextValue = progress + next;
+        colors += ',#FF0000' + ' ' + progress + '%' + ' ' + nextValue + '%';
+        progress += next;
+      }
+    }
+    colors += ')';
+    console.log(colors);
+    rangeSlider.style.backgroundImage = colors;
   }
 }
