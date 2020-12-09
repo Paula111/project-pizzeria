@@ -12,7 +12,6 @@ export class Booking {
     thisBooking.initWidgets();
     thisBooking.getData();
     thisBooking.selectTable();
-    //thisBooking.dom.wrapper = bookingWrapper;
   }
 
   render(bookingWrapper) {
@@ -27,6 +26,7 @@ export class Booking {
     thisBooking.dom.hourPicker = thisBooking.dom.wrapper.querySelector(select.widgets.hourPicker.wrapper);
     thisBooking.dom.tables = thisBooking.dom.wrapper.querySelectorAll(select.booking.tables);
     thisBooking.dom.starters = thisBooking.dom.wrapper.querySelectorAll(select.booking.starters);
+    thisBooking.dom.form = thisBooking.dom.wrapper.querySelector(select.booking.form);
   }
 
   initWidgets() {
@@ -35,16 +35,15 @@ export class Booking {
     thisBooking.hoursAmount = new AmountWidget(thisBooking.dom.hoursAmount);
     thisBooking.datePicker = new DatePicker(thisBooking.dom.datePicker);
     thisBooking.hourPicker = new HourPicker(thisBooking.dom.hourPicker);
-
     thisBooking.dom.wrapper.addEventListener('updated', function () {
       thisBooking.updateDOM();
     });
-    thisBooking.dom.wrapper.addEventListener('submit', function (event) {
+
+    thisBooking.dom.form.addEventListener('submit', function (event) {
       event.preventDefault();
       thisBooking.sendBooking();
     });
   }
-
 
   getData() {
     const thisBooking = this;
@@ -60,7 +59,7 @@ export class Booking {
       eventsCurrent: settings.db.notRepeatParam + '&' + utils.queryParams(startEndDates),
       eventsRepeat: settings.db.repeatParam + '&' + utils.queryParams(endDate),
     };
-    // console.log('getData params', params);
+    //console.log('getData params', params);
 
     const urls = {
       booking: settings.db.url + '/' + settings.db.booking + '?' + params.booking,
@@ -68,7 +67,7 @@ export class Booking {
       eventsRepeat: settings.db.url + '/' + settings.db.event + '?' + params.eventsRepeat,
     };
 
-    // console.log('getData urls', urls);
+    //console.log('getData urls', urls);
 
     Promise.all([
       fetch(urls.booking),
@@ -111,7 +110,7 @@ export class Booking {
         }
       }
     }
-    // console.log('thisBooking.booked:', thisBooking.booked);
+    console.log('thisBooking.booked:', thisBooking.booked);
     thisBooking.updateDOM();
   }
 
@@ -131,79 +130,75 @@ export class Booking {
       thisBooking.booked[date][hourBlock].push(table);
     }
   }
-
   updateDOM() {
     const thisBooking = this;
-    // console.log('updateDOM');
+    console.log('lol', thisBooking);
 
     thisBooking.date = thisBooking.datePicker.value;
     thisBooking.hour = utils.hourToNumber(thisBooking.hourPicker.value);
 
     for (let table of thisBooking.dom.tables) {
       let tableId = table.getAttribute(settings.booking.tableIdAttribute);
-      if (typeof thisBooking.booked[thisBooking.date] != 'undefined' &&
-        typeof thisBooking.booked[thisBooking.date][thisBooking.hour] !=
-        'undefined' &&
-        thisBooking.booked[thisBooking.date][thisBooking.hour].indexOf(tableId)
-      ) {
+
+      console.log(tableId, thisBooking.date, thisBooking.hour);
+
+      if (typeof thisBooking.booked[thisBooking.date] != 'undefined'
+        && typeof thisBooking.booked[thisBooking.date][thisBooking.hour] != 'undefined'
+        && thisBooking.booked[thisBooking.date][thisBooking.hour].includes(parseInt(tableId))) {
         table.classList.add(classNames.booking.tableBooked);
-        console.log('Table is booked now.');
+        console.log('booked');
       } else {
         table.classList.remove(classNames.booking.tableBooked);
-        console.log('Table is not available.');
+        console.log('free table');
       }
     }
     thisBooking.colorSlider();
   }
-
   selectTable() {
     const thisBooking = this;
     console.log('selectTable');
-
 
     for (let table of thisBooking.dom.tables) {
       table.addEventListener('click', function (event) {
         event.preventDefault();
 
-        // let tableId = table.getAttribute(settings.booking.tableIdAttribute);
+
+
         const tableClicked = table.getAttribute(settings.booking.tableIdAttribute);
 
-        if (typeof thisBooking.booked[thisBooking.date][thisBooking.hour] == 'undefined') {
-          if (table.classList.contains(classNames.booking.tableBooked)) {
-            table.classList.remove(classNames.booking.tableBooked);
 
-            console.log('Remove booking for this table');
-          }
+        if (table.classList.contains(classNames.booking.tableBooked)) {
+          table.classList.remove(classNames.booking.tableBooked);
+          console.log('Booking is removed now.');
 
-          else {
-            table.classList.add(classNames.booking.tableBooked);
+        } else {
+          table.classList.add(classNames.booking.tableBooked);
 
-            console.log('Table is booked');
-          }
+          console.log('Table is booked now.');
         }
+
         thisBooking.tableBooked = tableClicked;
       });
     }
   }
-
   sendBooking() {
     const thisBooking = this;
     console.log('sendBooking');
 
     const url = settings.db.url + '/' + settings.db.booking;
 
-    const payload = {
+    const booking = {
       date: thisBooking.datePicker.value,
       hour: thisBooking.hourPicker.value,
-      table: thisBooking.tableBooked,
       duration: thisBooking.hoursAmount.value,
       ppl: thisBooking.peopleAmount.value,
+      table: parseInt(thisBooking.tableBooked),
       starters: [],
     };
 
     for (let starter of thisBooking.dom.starters) {
-      if (starter.selected == true) {
-        payload.starters.push[starter.value];
+      if (starter.checked == true) {
+        booking.starter.push(starter.value);
       }
     }
 
@@ -212,7 +207,7 @@ export class Booking {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(payload),
+      body: JSON.stringify(booking),
     };
 
     fetch(url, options)
@@ -223,7 +218,6 @@ export class Booking {
         console.log('parsedResponse', parsedResponse);
       });
   }
-
   colorSlider() {
     const thisBooking = this;
     const rangeSlider = document.querySelector('.rangeSlider__horizontal');

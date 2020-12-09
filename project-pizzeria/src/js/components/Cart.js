@@ -9,6 +9,7 @@ export class Cart {
     const thisCart = this;
     thisCart.products = [];
     thisCart.deliveryFee = settings.cart.defaultDeliveryFee;
+    thisCart.products = [];
     thisCart.getElements(element);
     thisCart.initActions();
 
@@ -56,8 +57,8 @@ export class Cart {
     const payload = {
       //adress: 'test',
       products: [],
-      phone: thisCart.dom.phone,
-      adress: thisCart.dom.address,
+      phone: thisCart.dom.phone.value,
+      adress: thisCart.dom.address.value,
       totalPrice: thisCart.totalPrice,
       totalNumber: thisCart.totalNumber,
       subtotalPrice: thisCart.subtotalPrice,

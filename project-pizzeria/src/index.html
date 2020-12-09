@@ -11,7 +11,8 @@
   <link href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <link rel="stylesheet" href="vendor/range-slider.min.css">
-  <link rel="stylesheet" href="https://unpkg.com/flickity@2/dist/flickity.min.css" />
+  <link rel="stylesheet" href="https://unpkg.com/flickity@2/dist/flickity.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
   <link rel="stylesheet" href="css/style.css">
 </head>
 
@@ -207,14 +208,9 @@
       <!--Gallery-->
 
       <div class="footer container">
-
-
         <a href="https://www.instagram.com">View more on Instagram</a>
       </div>
-
     </section>
-
-
     <section id="order">
       <div id="product-list" class="product-list container"></div>
     </section>
@@ -222,6 +218,8 @@
       <div class="booking-wrapper container"></div>
     </section>
   </div>
+
+
 
   <script id="template-booking-widget" type="text/x-handlebars-template">
     <div class="booking-widget">
@@ -233,8 +231,8 @@
             <input type="text" name="date">
           </div>
           <div class="hour-picker range-slider">
-              <div class="output"></div>
-              <label class="booking-option-title">Pick a time</label>
+            <div class="output"></div>
+            <label class="booking-option-title">Pick a time</label>
             <input type="range" name="hour" value="12" min="12" max="24" step="0.5">
           </div>
         </div>
@@ -258,7 +256,7 @@
             Hours
             <div class="widget-amount hours-amount"> <!-- widget-amount -->
               <a class="btn-quantity" href="#less"><i class="fas fa-minus"></i></a>
-              <input class="amount" type="text" name="hours" value="1">
+              <input class="amount" type="text" name="hours" value="1" step="0.5">
               <a class="btn-quantity" href="#more"><i class="fas fa-plus"></i></a>
             </div>
           </label>
@@ -288,113 +286,113 @@
       </form>
     </div>
   </script>
-
   <script id="template-cart-product" type="text/x-handlebars-template">
-      <li>
-        <div class="widget-amount"> <!-- widget-amount -->
-          <a class="btn-quantity btn-quantity--lt" href="#less"><i class="fas fa-minus"></i></a>
-          <input class="amount" type="text" value="{{ amount }}">
-          <a class="btn-quantity btn-quantity--lt" href="#more"><i class="fas fa-plus"></i></a>
+    <li>
+      <div class="widget-amount"> <!-- widget-amount -->
+        <a class="btn-quantity btn-quantity--lt" href="#less"><i class="fas fa-minus"></i></a>
+        <input class="amount" type="text" value="{{ amount }}">
+        <a class="btn-quantity btn-quantity--lt" href="#more"><i class="fas fa-plus"></i></a>
+      </div>
+      <div class="cart__product">
+        <div class="cart__product-header">
+          <span>{{ name }}</span>
+          cart__order-summary
+          <span>$<strong class="cart__product-price">{{ price }}</strong></span>
         </div>
-        <div class="cart__product">
-          <div class="cart__product-header">
-            <span>{{ name }}</span>
-            <span>$<strong class="cart__product-price">{{ price }}</strong></span>
-          </div>
-          <ul class="cart__product-details no-spacing">
-            {{#each params}}
-              <li>
-                <span class="cart__product-details-label">{{ label }}</span>
-                <span>{{#joinValues options}}, {{/joinValues}}</span>
-              </li>
-            {{/each}}
-          </ul>
-        </div>
-        <ul class="cart__action-buttons no-spacing">
-          <li><a href="#edit">Edit<i class="fas fa-pencil-alt"></i></a></li>
-          <li><a href="#remove">Remove<i class="fas fa-trash-alt"></i></a></li>
+        <ul class="cart__product-details no-spacing">
+          {{#each params}}
+            <li>
+              <span class="cart__product-details-label">{{ label }}</span>
+              <span>{{#joinValues options}}, {{/joinValues}}</span>
+            </li>
+          {{/each}}
         </ul>
-      </li>
-    </script>
+      </div>
+      <ul class="cart__action-buttons no-spacing">
+        <li><a href="#edit">Edit<i class="fas fa-pencil-alt"></i></a></li>
+        <li><a href="#remove">Remove<i class="fas fa-trash-alt"></i></a></li>
+      </ul>
+    </li>
+  </script>
 
   <script id="template-menu-product" type="text/x-handlebars-template">
-      <article class="product"> <!-- product -->
+    <article class="product"> <!-- product -->
 
-          <header class="product__header">
-            <h3 class="product__name no-spacing">{{ name }} <i class="fas fa-chevron-down product__icon"></i></h3>
-            <p class="product__base-price no-spacing">${{ price }}</p>
-          </header>
-          <div class="product__description"> <!-- description -->
-            <p>{{{ description }}}</p>
-          </div> <!-- .description -->
-          <div class="product__wrapper"> <!-- details -->
-            <form class="product__order">
-              <ul class="product__params"> <!-- params -->
-                {{#each params as |param paramId| }}
-                {{#ifEquals type "checkboxes"}}
-                <li> <!-- checkboxes -->
-                  <h3 class="product__params-title">{{{ label }}}</h3>
-                  {{#each options}}
-                  <div class="checkbox"> <!-- checkbox -->
-                    <label>
-                      <input type="checkbox" name="{{ paramId }}" value="{{ @key }}" id="{{ @key }}" {{#if default}}checked{{/if}}>
-                      <span class="checkbox__checkmark"></span>
-                      {{{ label }}} (${{{ price }}})
-                    </label>
-                  </div>
-                  {{/each}}
-                </li>
-                {{/ifEquals}}
-                {{#ifEquals type "radios"}}
-                <li> <!-- radios -->
-                  <h3 class="product__params-title">{{{ label }}}</h3>
-                  {{#each options}}
-                  <div class="checkbox checkbox--round"> <!-- radio -->
-                    <label>
-                      {{{ label }}} (${{{ price }}})
-                      <input type="radio" name="{{ paramId }}" value="{{ @key }}" id="{{ @key }}" {{#if default}}checked{{/if}}>
-                      <span class="checkbox__checkmark"></span>
-                    </label>
-                  </div>
-                  {{/each}}
-                </li>
-                {{/ifEquals}}
-                {{#ifEquals type "select"}}
-                <li> <!-- select -->
-                  <h3 class="product__params-title">{{{ label }}}</h3>
-                  <select name="{{ paramId }}">
-                    {{#each options}}
-                    <option value="{{ @key }}" {{#if default}}selected{{/if}}>{{{ label }}} (${{{ price }}})</option>
-                    {{/each}}
-                  </select>
-                </li>
-                {{/ifEquals}}
+        <header class="product__header">
+          <h3 class="product__name no-spacing">{{ name }} <i class="fas fa-chevron-down product__icon"></i></h3>
+          <p class="product__base-price no-spacing">${{ price }}</p>
+        </header>
+        <div class="product__description"> <!-- description -->
+          <p>{{{ description }}}</p>
+        </div> <!-- .description -->
+        <div class="product__wrapper"> <!-- details -->
+          <form class="product__order">
+            <ul class="product__params"> <!-- params -->
+              {{#each params as |param paramId| }}
+              {{#ifEquals type "checkboxes"}}
+              <li> <!-- checkboxes -->
+                <h3 class="product__params-title">{{{ label }}}</h3>
+                {{#each options}}
+                <div class="checkbox"> <!-- checkbox -->
+                  <label>
+                    <input type="checkbox" name="{{ paramId }}" value="{{ @key }}" id="{{ @key }}" {{#if default}}checked{{/if}}>
+                    <span class="checkbox__checkmark"></span>
+                    {{{ label }}} (${{{ price }}})
+                  </label>
+                </div>
                 {{/each}}
-              </ul>
-              <div class="amount"> <!-- controls -->
-                <div class="widget-amount"> <!-- widget-amount -->
-                  <h3 class="product__params-title">Select quantity</h3>
-                  <a class="btn-quantity" href="#less"><i class="fas fa-minus"></i></a>
-                  <input type="text" class="amount">
-                  <a class="btn-quantity" href="#more"><i class="fas fa-plus"></i></a>
+              </li>
+              {{/ifEquals}}
+              {{#ifEquals type "radios"}}
+              <li> <!-- radios -->
+                <h3 class="product__params-title">{{{ label }}}</h3>
+                {{#each options}}
+                <div class="checkbox checkbox--round"> <!-- radio -->
+                  <label>
+                    {{{ label }}} (${{{ price }}})
+                    <input type="radio" name="{{ paramId }}" value="{{ @key }}" id="{{ @key }}" {{#if default}}checked{{/if}}>
+                    <span class="checkbox__checkmark"></span>
+                  </label>
                 </div>
-                <p class="product__total-price">
-                  Total: $<span class="price">{{{ price }}}</span>
-                </p>
-                <div> <!-- add-to-cart -->
-                  <a class="btn-primary" href="#add-to-cart">Add to cart</a>
-                </div>
-              </div>
-            </form>
-            <div class="product__images {{ class }}"> <!-- images -->
-              {{#each images}}
-              {{{ this }}}
+                {{/each}}
+              </li>
+              {{/ifEquals}}
+              {{#ifEquals type "select"}}
+              <li> <!-- select -->
+                <h3 class="product__params-title">{{{ label }}}</h3>
+                <select name="{{ paramId }}">
+                  {{#each options}}
+                  <option value="{{ @key }}" {{#if default}}selected{{/if}}>{{{ label }}} (${{{ price }}})</option>
+                  {{/each}}
+                </select>
+              </li>
+              {{/ifEquals}}
               {{/each}}
+            </ul>
+            <div class="amount"> <!-- controls -->
+              <div class="widget-amount"> <!-- widget-amount -->
+                <h3 class="product__params-title">Select quantity</h3>
+                <a class="btn-quantity" href="#less"><i class="fas fa-minus"></i></a>
+                <input class="amount" type="text">
+                <a class="btn-quantity" href="#more"><i class="fas fa-plus"></i></a>
+              </div>
+              <p class="product__total-price">
+                Total: $<span class="price">{{{ price }}}</span>
+              </p>
+              <div> <!-- add-to-cart -->
+                <a class="btn-primary" href="#add-to-cart">Add to cart</a>
+              </div>
             </div>
+          </form>
+          <div class="product__images {{ class }}"> <!-- images -->
+            {{#each images}}
+            {{{ this }}}
+            {{/each}}
           </div>
+        </div>
 
-      </article> <!-- .product -->
-    </script>
+    </article> <!-- .product -->
+  </script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.1.0/handlebars.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
