@@ -5,60 +5,15 @@ import { select, settings, classNames } from './settings.js';
 
 
 const app = {
-  initMenu: function () {
-    const thisApp = this;
-    ////////console.log('thisApp.data:', thisApp.data);
-
-    for (let productData in thisApp.data.products) {
-      new Product(
-        thisApp.data.products[productData].id,
-        thisApp.data.products[productData]
-      );
-    }
-  },
-
-  initData: function () {
-    const thisApp = this;
-    // thisApp.data = dataSource;
-    thisApp.data = {};
-    const url = settings.db.url + '/' + settings.db.product;
-
-    fetch(url)
-      .then(function (rawResponse) {
-        return rawResponse.json();
-      })
-      .then(function (parsedResponse) {
-        console.log('parsedResponse', parsedResponse);
-
-        /* save parsedResponse as thisApp.data.products */
-        thisApp.data.products = parsedResponse;
-        /*execute initMenu method */
-        thisApp.initMenu();
-      });
-
-    console.log('thisApp.data', JSON.stringify(thisApp.data));
-  },
-
-  initCart: function () {
-    const thisApp = this;
-
-    const cartElem = document.querySelector(select.containerOf.cart);
-    thisApp.cart = new Cart(cartElem);
-
-    thisApp.productList = document.querySelector(select.containerOf.menu);
-    thisApp.productList.addEventListener('add-to-cart', function (event) {
-      app.cart.add(event.detail.product);
-    });
-  },
-
   initPages: function () {
     const thisApp = this;
 
     thisApp.pages = document.querySelector(select.containerOf.pages).children;
+
     thisApp.navLinks = document.querySelectorAll(select.nav.links);
-  
+    thisApp.homeLinks = document.querySelectorAll('.link-wrapper a');
     const idFromHash = window.location.hash.replace('#/', '');
-    console.log('idFromHash', idFromHash);
+
 
     let pageMatchingHash = thisApp.pages[0].id;
 
@@ -68,6 +23,19 @@ const app = {
         break;
       }
     }
+
+    for (let homeLink of thisApp.homeLinks) {
+      homeLink.addEventListener('click', function (event) {
+        const clickedElement = this;
+        event.preventDefault();
+
+        const pageId = clickedElement.getAttribute('href').replace('#', '');
+        thisApp.activatePage(pageId);
+        homeLink.classList.add('active');
+        console.log('page listener', thisApp.activatePage);
+      });
+    }
+
     thisApp.activatePage(pageMatchingHash);
 
     for (let link of thisApp.navLinks) {
@@ -75,17 +43,15 @@ const app = {
         const clickedElement = this;
         event.preventDefault();
 
-        /* get page id from href attribute */
+        /* get page id from href attr*/
         const id = clickedElement.getAttribute('href').replace('#', '');
 
         /* run thisApp.activatePage with that id */
         thisApp.activatePage(id);
-
-        /* change URL hash */
-
         window.location.hash = '#/' + id;
       });
     }
+
   },
 
   activatePage: function (pageId) {
@@ -102,24 +68,65 @@ const app = {
     }
   },
 
+  initMenu: function () {
+    const thisApp = this;
+
+    for (let productData in thisApp.data.products) {
+      //new Product(productData, thisApp.data.products[productData]);
+      new Product(thisApp.data.products[productData].id, thisApp.data.products[productData]);
+    }
+    //console.log('testProduct:', testProduct);
+  },
+  initData: function () {
+    const thisApp = this;
+
+    thisApp.data = {};
+    const url = settings.db.url + '/' + settings.db.product;
+    fetch(url)
+      .then(function (rawResponse) {
+        return rawResponse.json();
+      })
+      .then(function (parsedResponse) {
+        console.log('parsedResponse:', parsedResponse);
+
+        thisApp.data.products = parsedResponse; /* save parsedResponse as thisApp.data.products */
+
+        thisApp.initMenu(); /* execute initMenu method */
+
+      });
+
+    console.log('thisApp.data', JSON.stringify(thisApp.data));
+
+  },
+  initCart: function () {
+    const thisApp = this;
+
+    const cartElem = document.querySelector(select.containerOf.cart);
+    thisApp.cart = new Cart(cartElem);
+
+    thisApp.productList = document.querySelector(select.containerOf.menu);
+
+    thisApp.productList.addEventListener('add-to-cart', function (event) {
+      app.cart.add(event.detail.product);
+    });
+  },
   initBooking: function () {
     const thisApp = this;
-    const bookingWrapper = document.querySelector(select.containerOf.booking);
-    console.log('bookingWrapper:', bookingWrapper);
+    const bookingWidget = document.querySelector(select.containerOf.booking);
+    thisApp.booking = new Booking(bookingWidget);
 
-    thisApp.booking = new Booking(bookingWrapper);
   },
-
   init: function () {
     const thisApp = this;
-    ////console.log('*** App starting ***');
-    ////console.log('thisApp:', thisApp);
-    ////console.log('classNames:', classNames);
-    ////console.log('settings:', settings);
-    ////console.log('templates:', templates);
+    //console.log('*** App starting ***');
+    //console.log('thisApp:', thisApp);
+    //console.log('classNames:', classNames);
+    //console.log('settings:', settings);
+    //console.log('templates:', templates);
 
     thisApp.initPages();
     thisApp.initData();
+    thisApp.initMenu();
     thisApp.initCart();
     thisApp.initBooking();
   },
